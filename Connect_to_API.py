@@ -6,8 +6,30 @@ import json
 
 def download_blob(url, blobname, sas):
     call = f'{url}/{blobname}{sas}'
-    print('downloaded Blob')
+    print(f'Downloading blob: {blobname}')
     return urllib.request.urlretrieve(call, blobname)
+
+
+def download_blob_from_list(filename, url, sas):
+    blobsum = 0
+    blobfel = 0
+    try:
+        bloblist = open(filename)
+    except:
+        print("Kunde inte öppna filen")
+    for blob in bloblist:
+        blobname = blob.strip()
+        try:
+            download_blob(url,blobname,sas)
+            blobsum +=1
+        except:
+            print(f'Failed to download {blobname}')
+            blobfel +=1
+    if blobfel > 0:
+        print(f"ERROR! Kunde inte ladda hem {blobfel} blobar!")
+    print(f"Laddade hem {blobsum} blobar!")
+    return 'Done!'
+
 
 
 def get_blobnames(url, sas):
@@ -54,41 +76,7 @@ instagram_url = key['instagram_url']
 instagram_sas = key['instagram_sas']
 
 # Hämta BLOB-listan som XML
-get_bloblist_as_xml(facebook_url,facebook_sas)
+#get_bloblist_as_xml(facebook_url,facebook_sas)
 
-'''
-EXEMPEL TA HEM 20 RANDOM BLOBAR
-blobnames = get_blobnames(url, sas)
-bloblista = list()
+download_blob_from_list('blobsfordownload.txt',facebook_url,facebook_sas)
 
-for blob in blobnames:
-    print(blob.text)
-    bloblista.append(blob.text)
-
-for value in bloblista[:20]:
-    print(url+value+sas)
-    downloadblob(url,value,sas)
-
-
-EXEMPEL TA HEM ENSTAKA BLOBAR
-
-#download_blob(facebook_url,'Channel_D88535118FE84D8DAEA7BCE6BDA05CD0.zip',facebook_sas)
-#download_blob(instagram_url,'Channel_91901DE358844B67A824E9D5E933ED4A.zip', instagram_sas)
-
-
-
-
-EXEMPEL TA HEM UTVALDA BLOBAR FRÅN FIL
-
-file = open('blobsfordownload.txt')
-blobllista = []
-
-for text in file:
-   blob = text.strip()
-   blobllista.append(blob)
-
-for blob in blobllista:
-    print(blob)
-    download_blob(instagram_url,blob,instagram_sas)
-
-'''
